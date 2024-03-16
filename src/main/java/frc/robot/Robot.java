@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.commandclimb;
 import frc.robot.subsystems.passthrough;
 import frc.robot.subsystems.shooter_cannon;
-import frc.robot.Constants.*;
+import frc.robot.subsystems.intake;
 
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
@@ -67,22 +67,27 @@ public class Robot extends TimedRobot {
     commandclimb climber = new commandclimb(new TalonFX(Constants.climbconstants.CLIMB_MOTOR_ID));
     passthrough pass = new passthrough(new TalonFX(Constants.passthroughconstants.LEFT_PASS), new TalonFX(Constants.passthroughconstants.RIGHT_PASS));
     shooter_cannon shooter = new shooter_cannon(new TalonFX(Constants.cannonconstants.LEFT_SHOOT_ID), new TalonFX(Constants.cannonconstants.RIGHT_SHOOT_ID));
-
+    intake intake = new intake(new TalonFX(0));
     // Climber: One single operation per-match
     if(joystick2.getYButtonReleased()) climber.climbup();
     else if(joystick2.getXButtonReleased()) climber.climbstop();
 
     // Passthrough
-    if(joystick2.getLeftBumper()) pass.setspeed(-0.2);
-    else if(joystick2.getRightBumper()) pass.setspeed(0.2);
-    else pass.setspeed(0.0);
-    
-    // Shooter
-    if(joystick2.getBackButtonReleased()) shooter.shootit();
-    else if(joystick2.getStartButtonReleased()) shooter.stop();
-
-    
-
+    // if(joystick2.getLeftBumper()){
+    //   pass.setspeed(-0.2);
+    //   intake.setspeed(-0.2);
+    // }
+    // else if(joystick2.getRightBumper()){
+    //   pass.setspeed(0.2);
+    //   intake.setspeed(0.2);
+    // }
+    // else{
+    //   pass.setspeed(0);
+    //   intake.setspeed(0);
+    // }
+    // // Shooter
+    // if(joystick2.getBackButtonReleased()) shooter.shootit();
+    // else if(joystick2.getStartButtonReleased()) shooter.stop();
   }
 
   @Override
