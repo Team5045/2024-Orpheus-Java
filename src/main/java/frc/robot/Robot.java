@@ -73,21 +73,21 @@ public class Robot extends TimedRobot {
     else if(joystick2.getXButtonReleased()) climber.climbstop();
 
     // Passthrough
-    // if(joystick2.getLeftBumper()){
-    //   pass.setspeed(-0.2);
-    //   intake.setspeed(-0.2);
-    // }
-    // else if(joystick2.getRightBumper()){
-    //   pass.setspeed(0.2);
-    //   intake.setspeed(0.2);
-    // }
-    // else{
-    //   pass.setspeed(0);
-    //   intake.setspeed(0);
-    // }
-    // // Shooter
-    // if(joystick2.getBackButtonReleased()) shooter.shootit();
-    // else if(joystick2.getStartButtonReleased()) shooter.stop();
+    if(joystick2.getLeftBumper()){
+      pass.setspeed(-0.2);
+      intake.setspeed(-0.2);
+    }
+    else if(joystick2.getRightBumper()){
+      pass.setspeed(0.2);
+      intake.setspeed(0.2);
+    }
+    else{
+      pass.setspeed(0);
+      intake.setspeed(0);
+    }
+    // Shooter
+    if(joystick2.getBackButtonReleased()) shooter.shootit();
+    else if(joystick2.getStartButtonReleased()) shooter.stop();
   }
 
   @Override
