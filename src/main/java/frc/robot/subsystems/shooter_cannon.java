@@ -12,8 +12,8 @@ public class shooter_cannon extends SubsystemBase{
     }
     
     public void shootit(){
-        cannonmotor1.set(0.7);
-        cannonmotor2.set(0.7);
+        cannonmotor1.set(-0.4);
+        cannonmotor2.set(0.4);
     }
     public void stop(){
         cannonmotor1.set(0.0);

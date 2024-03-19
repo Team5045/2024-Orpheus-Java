@@ -12,6 +12,6 @@ public class passthrough extends SubsystemBase{
     }
     public void setspeed(double speed){
         left_motor.set(speed);
-        right_motor.set(speed);
+        right_motor.set(-speed);
     }
 }
