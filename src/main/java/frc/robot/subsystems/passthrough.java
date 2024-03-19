@@ -1,17 +1,20 @@
 package frc.robot.subsystems;
 import com.ctre.phoenix6.hardware.TalonFX;
+
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.passthroughConstants;
 
 public class passthrough extends SubsystemBase{
-    private TalonFX right_motor;
-    private TalonFX left_motor;
+    private final TalonFX m_motor_right = new TalonFX(passthroughConstants.kMotorPort_Right);
+    private final TalonFX m_motor_left = new TalonFX(passthroughConstants.kMotorPort_Left);
 
-    public passthrough(TalonFX L, TalonFX R){
-        this.left_motor = L;
-        this.right_motor = R;
+    public Command shoot() {
+        return run(() -> m_motor_right.set(0.3)).alongWith(run(() -> m_motor_left.set(0.3)));
+
     }
-    public void setspeed(double speed){
-        left_motor.set(speed);
-        right_motor.set(speed);
+
+    public Command unshoot() {
+        return run(() -> m_motor_right.set(-0.3)).alongWith(run(() -> m_motor_left.set(-0.3)));
     }
 }

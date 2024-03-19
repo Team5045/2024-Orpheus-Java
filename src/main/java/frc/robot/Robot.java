@@ -6,23 +6,54 @@ package frc.robot;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.subsystems.commandclimb;
-import frc.robot.subsystems.passthrough;
-import frc.robot.subsystems.shooter_cannon;
-import frc.robot.subsystems.intake;
+// import frc.robot.subsystems.commandClimb;
+// import frc.robot.subsystems.passthrough;
+// import frc.robot.subsystems.shooter_cannon;
+// import frc.robot.subsystems.intake;
 
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
 
+  private TalonFX m_climbMotor;
+
+  private TalonFX m_climbEncoder;
+
+  private TalonFX m_pivotMotor_Right;
+  private TalonFX m_pivotMotor_Left;
+
+  private static double kDt = 0.02;
+  private static double kMaxVelocity = 1.75;
+  private static double kMaxAcceleration = 0.75;
+  private static double kP = 1.3;
+  private static double kI = 0.0;
+  private static double kD = 0.7;
+  private static double kS = 1.1;
+  private static double kG = 1.2;
+  private static double kV = 1.3;
+
+  private final TrapezoidProfile.Constraints m_constraints = new TrapezoidProfile.Constraints(kMaxVelocity, kMaxAcceleration);
+  private final ProfiledPIDController m_climbController = new ProfiledPIDController(kP, kI, kD, m_constraints, kDt);
+  private final ElevatorFeedforward m_feedForward = new ElevatorFeedforward(kS, kG, kV);
+
   @Override
   public void robotInit() {
     m_robotContainer = new RobotContainer();
+
+    m_climbMotor = new TalonFX(20);
+
+    m_pivotMotor_Right = new TalonFX(17);
+    m_pivotMotor_Left = new TalonFX(18);
+
+    m_climbEncoder = m_climbMotor;
   }
 
   @Override
@@ -64,34 +95,24 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic(){
     XboxController joystick2 = new XboxController(0);
-    commandclimb climber = new commandclimb(new TalonFX(Constants.climbconstants.CLIMB_MOTOR_ID));
-    passthrough pass = new passthrough(new TalonFX(Constants.passthroughconstants.LEFT_PASS), new TalonFX(Constants.passthroughconstants.RIGHT_PASS));
-    shooter_cannon shooter = new shooter_cannon(new TalonFX(Constants.cannonconstants.LEFT_SHOOT_ID), new TalonFX(Constants.cannonconstants.RIGHT_SHOOT_ID));
-    intake intake = new intake(new TalonFX(0));
-    // Climber: One single operation per-match
-    if(joystick2.getYButtonReleased()) climber.climbup();
-    else if(joystick2.getXButtonReleased()) climber.climbstop();
-
-    // Passthrough
-    if(joystick2.getLeftBumper()){
-      pass.setspeed(-0.2);
-      intake.setspeed(-0.2);
-    }
-    else if(joystick2.getRightBumper()){
-      pass.setspeed(0.2);
-      intake.setspeed(0.2);
-    }
-    else{
-      pass.setspeed(0);
-      intake.setspeed(0);
-    }
-    // Shooter
-    if(joystick2.getBackButtonReleased()) shooter.shootit();
-    else if(joystick2.getStartButtonReleased()) shooter.stop();
-  }
+    System.out.println(m_pivotMotor_Left.getPosition());
+    // if (joystick2.getXButton()){
+    //   m_intakeMotor.set(0.5);
+    // }
+//     if (joystick2.getYButton()){
+//       m_climbController.setGoal(1);
+//     } else if (joystick2.getAButton()){
+//       m_climbController.setGoal(0);
+//     }
+//     m_climbMotor.setVoltage(
+//       m_climbController.calculate(m_climbEncoder.getDifferentialAveragePosition().getValueAsDouble())
+//       + m_feedForward.calculate(m_climbController.getSetpoint().velocity));
+}
 
   @Override
-  public void teleopExit() {}
+  public void teleopExit() {
+
+  }
 
   @Override
   public void testInit() {

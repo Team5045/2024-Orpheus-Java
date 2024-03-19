@@ -1,22 +1,19 @@
 package frc.robot.subsystems;
 import com.ctre.phoenix6.hardware.TalonFX;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.shooterConstants;
 
 public class shooter_cannon extends SubsystemBase{
-    private TalonFX cannonmotor1;
-    private TalonFX cannonmotor2;
+    private final TalonFX m_motor_right = new TalonFX(shooterConstants.kMotorPort_Right);
+    private final TalonFX m_motor_left = new TalonFX(shooterConstants.kMotorPort_Right);
 
-    public shooter_cannon(TalonFX motor1, TalonFX motor2){
-        this.cannonmotor1 = motor1;
-        this.cannonmotor2 = motor2;
+    public Command shoot() {
+        return run(() -> m_motor_right.set(0.3)).alongWith(run(() -> m_motor_left.set(0.3)));
+
     }
-    
-    public void shootit(){
-        cannonmotor1.set(0.7);
-        cannonmotor2.set(0.7);
-    }
-    public void stop(){
-        cannonmotor1.set(0.0);
-        cannonmotor2.set(0.0);
+
+    public Command unshoot() {
+        return run(() -> m_motor_right.set(-0.3)).alongWith(run(() -> m_motor_left.set(-0.3)));
     }
 }

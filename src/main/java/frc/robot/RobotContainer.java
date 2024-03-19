@@ -4,10 +4,8 @@
 
 package frc.robot;
 
-import frc.robot.Constants.climbconstants;
-import frc.robot.Constants.cannonconstants;
+
 import com.ctre.phoenix6.Utils;
-import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 
@@ -16,12 +14,11 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.commandclimb;
-import frc.robot.subsystems.shooter_cannon;
+import frc.robot.subsystems.intake;
+import frc.robot.subsystems.pivot;
+
 
 public class RobotContainer {
   private double MaxSpeed = TunerConstants.kSpeedAt12VoltsMps; // kSpeedAt12VoltsMps desired top speed
@@ -29,26 +26,45 @@ public class RobotContainer {
 
   // /* Setting up bindings for necessary control of the swerve drive platform */
   private final CommandXboxController joystick = new CommandXboxController(0); // My joystick
-  private final XboxController joystick2 = new XboxController(0);
-  // private final CommandSwerveDrivetrain drivetrain = TunerConstants.DriveTrain; // My drivetrain
-  // public boolean shoot = false;
-  // public boolean climb = false;
+  private final CommandSwerveDrivetrain drivetrain = TunerConstants.DriveTrain; // My drivetrain
+  // private final intake m_intake = new intake();
+  private final pivot m_pivot = new pivot();
 
-  // private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-  //     .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
-  //     .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // I want field-centric
-  //                                                              // driving in open loop
+  private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
+      .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
+      .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // I want field-centric
+                                                               // driving in open loop
   // private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
   // private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
-  // private final Telemetry logger = new Telemetry(MaxSpeed);
+  private final Telemetry logger = new Telemetry(MaxSpeed);
 
   private void configureBindings() {
-    // drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
-    //     drivetrain.applyRequest(() -> drive.withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with
-    //                                                                                        // negative Y (forward)
-    //         .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-    //         .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
-    //     ));
+    drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
+        drivetrain.applyRequest(() -> drive.withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with
+                                                                                           // negative Y (forward)
+            .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+            .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
+        ));
+    
+    joystick.b().onTrue(
+      Commands.runOnce(() -> {
+        m_pivot.setGoal(-0.6);
+        m_pivot.enable();
+      },
+      m_pivot));
+    
+    joystick.a().onTrue(
+      Commands.runOnce(() -> {
+        m_pivot.setGoal(Constants.pivotConstants.kPivotOffsetRads);
+        m_pivot.enable();
+      },
+      m_pivot));
+    
+
+    // joystick.x().whileTrue(m_intake.intakeCommand());
+    // joystick.x().onTrue(m_intake.intakeCommand());
+
+
 
     // joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
     // joystick.b().whileTrue(drivetrain
@@ -57,10 +73,10 @@ public class RobotContainer {
     // // reset the field-centric heading on left bumper press
     // joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldRelative()));
 
-    // if (Utils.isSimulation()) {
-    //   drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
-    // }
-    // drivetrain.registerTelemetry(logger::telemeterize);
+    if (Utils.isSimulation()) {
+      drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
+    }
+    drivetrain.registerTelemetry(logger::telemeterize);
   }
   public RobotContainer() {
     configureBindings();
